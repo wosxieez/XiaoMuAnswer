@@ -1,0 +1,157 @@
+package com.xiaomu.view.questionview
+{
+	import com.xiaomu.data.Question;
+	import com.xiaomu.manager.DataManager;
+	
+	import flash.events.MouseEvent;
+	
+	import coco.component.Button;
+	import coco.component.Panel;
+	import coco.component.TextArea;
+	import coco.component.TextInput;
+	import coco.manager.PopUpManager;
+	
+	/**
+	 * 添加问题视图 
+	 * @author coco
+	 * 
+	 */	
+	public class AddQuestionView extends Panel
+	{
+		public function AddQuestionView()
+		{
+			super();
+			
+			width = 600;
+			height = 500;
+			title = "添加问题";
+		}
+		
+		//---------------------------------------------------------------------------------------------------------------------
+		//
+		//  Get Instance
+		//
+		//---------------------------------------------------------------------------------------------------------------------
+		
+		private static var instance:AddQuestionView;
+		
+		public static function getInstance():AddQuestionView
+		{
+			if (!instance)
+				instance = new AddQuestionView();
+			
+			return instance;
+		}
+		
+		
+		//---------------------------------------------------------------------------------------------------------------------
+		//
+		//  Variables
+		//
+		//---------------------------------------------------------------------------------------------------------------------
+		
+		private var questionInput:TextArea;
+		private var answerAInput:TextInput;
+		private var answerBInput:TextInput;
+		private var answerCInput:TextInput;
+		private var answerDInput:TextInput;
+		private var cancelButton:Button;
+		private var okButton:Button;
+		
+		
+		//---------------------------------------------------------------------------------------------------------------------
+		//
+		//  Methods
+		//
+		//---------------------------------------------------------------------------------------------------------------------
+		
+		
+		override protected function createChildren():void
+		{
+			super.createChildren();
+			
+			questionInput = new TextArea();
+			questionInput.y = 10;
+			questionInput.height = 150;
+			addChild(questionInput);
+			
+			answerAInput = new TextInput();
+			answerAInput.y = 160;
+			answerAInput.height = 30;
+			addChild(answerAInput);
+			
+			answerBInput = new TextInput();
+			answerBInput.y = 190;
+			answerBInput.height = 30;
+			addChild(answerBInput);
+			
+			answerCInput = new TextInput();
+			answerCInput.y = 220;
+			answerCInput.height = 30;
+			addChild(answerCInput);
+			
+			answerDInput = new TextInput();
+			answerDInput.y = 250;
+			answerDInput.height = 30;
+			addChild(answerDInput);
+			
+			cancelButton = new Button();
+			cancelButton.label = "取消";
+			cancelButton.height = 30;
+			cancelButton.addEventListener(MouseEvent.CLICK, cancelButton_clickHandler);
+			addChild(cancelButton);
+			
+			okButton = new Button();
+			okButton.label = "确定";
+			okButton.height = 30;
+			okButton.addEventListener(MouseEvent.CLICK, okButton_clickHandler);
+			addChild(okButton);
+		}
+		
+		override protected function updateDisplayList():void
+		{
+			super.updateDisplayList();
+			
+			questionInput.width = width;
+			answerAInput.width = answerBInput.width = answerCInput.width = answerDInput.width = width;
+			
+			cancelButton.width = width/2;
+			cancelButton.y = contentHeight - cancelButton.height;
+			
+			okButton.width = cancelButton.width;
+			okButton.x = cancelButton.width;
+			okButton.y = cancelButton.y;
+		}
+		
+		protected function okButton_clickHandler(event:MouseEvent):void
+		{
+		 	var question:Question = new Question();
+			question.name = questionInput.text;
+			
+			if (answerAInput.text && answerAInput.text.length > 0)
+				question.answers.push(answerAInput.text);
+			
+			if (answerBInput.text && answerBInput.text.length > 0)
+				question.answers.push(answerBInput.text);
+			
+			if (answerCInput.text && answerCInput.text.length > 0)
+				question.answers.push(answerCInput.text);
+			
+			if (answerDInput.text && answerDInput.text.length > 0)
+				question.answers.push(answerDInput.text);
+			
+			// 保存到数据管理器中
+			DataManager.getInstance().addQuestion(question);
+			
+			// 关闭窗口
+			PopUpManager.removePopUp(this);
+		}
+		
+		protected function cancelButton_clickHandler(event:MouseEvent):void
+		{
+			// 关闭窗口
+			PopUpManager.removePopUp(this);
+		}
+		
+	}
+}

@@ -1,0 +1,114 @@
+package com.xiaomu.view.teamview
+{
+	import com.xiaomu.event.DataManagerEvent;
+	import com.xiaomu.manager.DataManager;
+	import com.xiaomu.renderer.TeamItemRenderer;
+	
+	import flash.events.MouseEvent;
+	
+	import coco.component.Button;
+	import coco.component.List;
+	import coco.component.Panel;
+	import coco.component.VerticalAlign;
+	import coco.manager.PopUpManager;
+	
+	/**
+	 * 团队视图 
+	 * @author coco
+	 */	
+	public class TeamView extends Panel
+	{
+		public function TeamView()
+		{
+			super();
+			
+			title = "小组列表";
+			width = 400;
+			height = 300;
+			DataManager.getInstance().addEventListener(DataManagerEvent.TEAM_DATA_CHANGED, teamChangeHandler);
+		}
+		
+		
+		//----------------------------------------------------------------------------------------------------------------------------------------
+		//
+		//  Get Instance
+		//
+		//----------------------------------------------------------------------------------------------------------------------------------------
+		
+		private static var instance:TeamView;
+		
+		public static function getInstance():TeamView
+		{
+			if (!instance)
+				instance = new TeamView();
+			
+			return instance;
+		}
+		
+		
+		private var teamList:List;
+		private var cancelButton:Button;
+		private var okButton:Button;
+		
+		override protected function createChildren():void
+		{
+			super.createChildren();
+			
+			teamList = new List();
+			teamList.labelField = "name";
+			teamList.verticalAlign = VerticalAlign.TOP;
+			teamList.itemRendererClass = TeamItemRenderer;
+			addChild(teamList);
+			
+			cancelButton = new Button();
+			cancelButton.label = "关闭";
+			cancelButton.height = 30;
+			cancelButton.addEventListener(MouseEvent.CLICK, cancelButton_clickHandler);
+			addChild(cancelButton);
+			
+			okButton = new Button();
+			okButton.label = "添加";
+			okButton.height = 30;
+			okButton.addEventListener(MouseEvent.CLICK, okButton_clickHandler);
+			addChild(okButton);
+		}
+		
+		override protected function commitProperties():void
+		{
+			super.commitProperties();
+			
+			teamList.dataProvider = DataManager.getInstance().getTeams();
+		}
+		
+		override protected function updateDisplayList():void
+		{
+			super.updateDisplayList();
+			
+			cancelButton.width = width/2;
+			cancelButton.y = contentHeight - cancelButton.height;
+			
+			okButton.width = cancelButton.width;
+			okButton.x = cancelButton.width;
+			okButton.y = cancelButton.y;
+			
+			teamList.width = width;
+			teamList.height = okButton.y;
+		}
+		
+		protected function okButton_clickHandler(event:MouseEvent):void
+		{
+			PopUpManager.centerPopUp(PopUpManager.addPopUp(AddTeamView.getInstance(), null, true, false, 0));
+		}
+		
+		protected function teamChangeHandler(event:DataManagerEvent):void
+		{
+			invalidateProperties();
+		}
+		
+		protected function cancelButton_clickHandler(event:MouseEvent):void
+		{
+			PopUpManager.removePopUp(this);
+		}
+		
+	}
+}

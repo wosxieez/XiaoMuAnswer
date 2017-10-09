@@ -1,0 +1,95 @@
+package com.xiaomu.view.questionview
+{
+	import coco.component.Button;
+	import coco.component.Panel;
+	import coco.component.TextArea;
+	import coco.component.TextInput;
+	
+	public class AddQuestionView extends Panel
+	{
+		public function AddQuestionView()
+		{
+			super();
+			
+			width = 600;
+			height = 500;
+			title = "添加问题";
+		}
+		
+		//----------------------------------------------------------------------------------------------------------------
+		//
+		//  Get Instance
+		//
+		//----------------------------------------------------------------------------------------------------------------
+		
+		private static var instance:AddQuestionView;
+		
+		public static function getInstance():AddQuestionView
+		{
+			if (!instance)
+				instance = new AddQuestionView();
+			
+			return instance;
+		}
+		
+		
+		//----------------------------------------------------------------------------------------------------------------
+		//
+		//  Variables
+		//
+		//----------------------------------------------------------------------------------------------------------------
+		
+		private var questionInput:TextArea;
+		private var answerAInput:TextInput;
+		private var answerBInput:TextInput;
+		private var answerCInput:TextInput;
+		private var answerDInput:TextInput;
+		private var okButton:Button;
+		
+		
+		//----------------------------------------------------------------------------------------------------------------
+		//
+		//  Methods
+		//
+		//----------------------------------------------------------------------------------------------------------------
+		
+		
+		override protected function createChildren():void
+		{
+			super.createChildren();
+			
+			questionInput = new TextArea();
+			questionInput.height = 150;
+			addChild(questionInput);
+			
+			answerAInput = new TextInput();
+			answerAInput.y = 150;
+			answerAInput.height = 30;
+			addChild(answerAInput);
+			
+			answerBInput = new TextInput();
+			answerBInput.y = 180;
+			answerBInput.height = 30;
+			addChild(answerBInput);
+			
+			answerCInput = new TextInput();
+			answerCInput.y = 210;
+			answerCInput.height = 30;
+			addChild(answerCInput);
+			
+			answerDInput = new TextInput();
+			answerDInput.y = 240;
+			answerDInput.height = 30;
+			addChild(answerDInput);
+		}
+		
+		override protected function updateDisplayList():void
+		{
+			super.updateDisplayList();
+			
+			questionInput.width = width;
+			answerAInput.width = answerBInput.width = answerCInput.width = answerDInput.width = width;
+		}
+		
+	}
+}

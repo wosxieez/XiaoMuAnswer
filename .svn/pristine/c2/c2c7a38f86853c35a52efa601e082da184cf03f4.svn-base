@@ -1,0 +1,364 @@
+package com.xiaomu.manager
+{
+	import com.xiaomu.data.Answer;
+	import com.xiaomu.data.Question;
+	import com.xiaomu.data.Student;
+	import com.xiaomu.data.Teacher;
+	import com.xiaomu.data.Team;
+	import com.xiaomu.event.DataManagerEvent;
+	
+	import flash.events.EventDispatcher;
+	import flash.events.IEventDispatcher;
+	import flash.net.SharedObject;
+	
+	[Event(name="teamDataChanged", type="com.xiaomu.event.DataManagerEvent")]
+	
+	[Event(name="studentDataChanged", type="com.xiaomu.event.DataManagerEvent")]
+	
+	[Event(name="questionDataChanged", type="com.xiaomu.event.DataManagerEvent")]
+	
+	[Event(name="answerDataChanged", type="com.xiaomu.event.DataManagerEvent")]
+	
+	/**
+	 * 数据管理器 
+	 * @author coco
+	 * 
+	 */	
+	public class DataManager extends EventDispatcher
+	{
+		public function DataManager(target:IEventDispatcher=null)
+		{
+			super(target);
+		}
+		
+		//----------------------------------------------------------------------------------------------------------------------------------------
+		//
+		//  Get Instance
+		//
+		//----------------------------------------------------------------------------------------------------------------------------------------
+		
+		private static var instance:DataManager;
+		
+		public static function getInstance():DataManager
+		{
+			if (!instance)
+				instance = new DataManager();
+			
+			return instance;
+		}
+		
+		
+		//----------------------------------------------------------------------------------------------------------------------------------------
+		//
+		//  Variables
+		//
+		//----------------------------------------------------------------------------------------------------------------------------------------
+		
+		/**
+		 * 教师的数据
+		 */		
+		private var teacher:Teacher = new Teacher();
+		
+		//----------------------------------------------------------------------------------------------------------------------------------------
+		//
+		//  Methods
+		//
+		//----------------------------------------------------------------------------------------------------------------------------------------
+		
+		/**
+		 * 保存数据 
+		 */		
+		public function storeAppData():void
+		{
+			try
+			{
+				SharedObject.getLocal("xiaomu").data.teacher = JSON.stringify(teacher);
+				trace(JSON.stringify(teacher));
+				SharedObject.getLocal("xiaomu").flush();
+				trace("缓存程序数据成功");
+			} 
+			catch(error:Error) 
+			{
+				trace("缓存程序数据失败");
+			}
+		}
+		
+		public function restoreAppData():void
+		{
+			try
+			{
+				var dataString:String = SharedObject.getLocal("xiaomu").data.teacher;
+				if (dataString)
+				{
+					var data:Object = JSON.parse(dataString);
+					teacher.id = data.id;
+					teacher.name = data.name;
+					var team:Team;
+					for each(var itemTeam:Object in data.teams)
+					{
+						team = new Team();
+						team.id = itemTeam.id;
+						team.name = itemTeam.name;
+						teacher.teams.push(team);
+					}
+					var question:Question;
+					for each(var itemQuestion:Object in data.questions)
+					{
+						question = new Question();
+						question.id = itemQuestion.id;
+						question.allowMultipleSelection = itemQuestion.allowMultipleSelection;
+						question.name = itemQuestion.name;
+						for each(var answer:String in itemQuestion.answers)
+						{
+							question.answers.push(answer);
+						}
+						teacher.questions.push(question);
+					}
+					trace("恢复程序数据成功");
+				}
+				else
+				{
+					trace("没有发现缓存数据");
+				}
+			} 
+			catch(error:Error) 
+			{
+				trace("恢复程序数据失败", error.message);
+				teacher = new Teacher();
+			}
+		}
+		
+		public function addQuestion(question:Question):void
+		{
+			if (!question) return;
+			
+			removeQuestion(question.id);
+			teacher.questions.push(question);
+			var e:DataManagerEvent = new DataManagerEvent(DataManagerEvent.QUESTION_DATA_CHANGED);
+			dispatchEvent(e);
+		}
+		
+		public function removeQuestion(id:String):void
+		{
+			var qindex:int = teacher.questions.length;
+			var q:Question;
+			for (var i:int = qindex - 1; i >= 0; i--)
+			{
+				q = teacher.questions[i];
+				if (q.id == id)
+				{
+					teacher.questions.splice(i, 1); // delete
+					var e:DataManagerEvent = new DataManagerEvent(DataManagerEvent.QUESTION_DATA_CHANGED);
+					dispatchEvent(e);
+				}
+			}
+		}
+		
+		public function getQuestion(id:String):Question
+		{
+			var qindex:int = teacher.questions.length;
+			var q:Question;
+			for (var i:int = qindex - 1; i >= 0; i--)
+			{
+				q = teacher.questions[i];
+				if (q.id == id)
+				{
+					return q;
+				}
+			}
+			
+			return null;
+		}
+		
+		public function getQuestions():Array
+		{
+			return teacher.questions;
+		}
+		
+		public function addStudent(student:Student):void
+		{
+			if (!student) return;
+			
+			removeStudent(student.id);
+			teacher.students.push(student);
+			
+			var e:DataManagerEvent = new DataManagerEvent(DataManagerEvent.STUDENT_DATA_CHANGED);
+			dispatchEvent(e);
+		}
+		
+		public function updateStudent(newStudent:Student):void
+		{
+			var oldStudent:Student = getStudent(newStudent.id);
+			if (oldStudent)
+			{
+				oldStudent.name = newStudent.name;
+				oldStudent.teamID = newStudent.teamID;
+				var e:DataManagerEvent = new DataManagerEvent(DataManagerEvent.STUDENT_DATA_CHANGED);
+				dispatchEvent(e);
+			}
+		}
+		
+		public function removeStudent(id:String):void
+		{
+			var sindex:int = teacher.students.length;
+			var s:Student;
+			for (var i:int = sindex - 1; i >= 0; i--)
+			{
+				s = teacher.students[i];
+				if (s.id == id)
+				{
+					teacher.students.splice(i, 1); // delete
+					var e:DataManagerEvent = new DataManagerEvent(DataManagerEvent.STUDENT_DATA_CHANGED);
+					dispatchEvent(e);
+				}
+			}
+		}
+		
+		public function getStudent(id:String):Student
+		{
+			var sindex:int = teacher.students.length;
+			var s:Student;
+			for (var i:int = sindex - 1; i >= 0; i--)
+			{
+				s = teacher.students[i];
+				if (s.id == id)
+				{
+					return s;
+				}
+			}
+			
+			return null;
+		}
+		
+		public function getStudents():Array
+		{
+			return teacher.students;
+		}
+		
+		public function getTeamStudents(team:Team):Array
+		{
+			if (!team)
+				return null;
+			
+			var teamStudents:Array = [];
+			for each (var student:Student in teacher.students)
+			{
+				if (student.teamID == team.id)
+					teamStudents.push(student);
+			}
+			return teamStudents;
+		}
+		
+		public function addTeam(team:Team):void
+		{
+			if (!team) return;
+			
+			removeTeam(team.id);
+			teacher.teams.push(team);
+			var e:DataManagerEvent = new DataManagerEvent(DataManagerEvent.TEAM_DATA_CHANGED);
+			dispatchEvent(e);
+			ServiceManager.getInstance().sendTeamsToStudents();
+		}
+		
+		public function updateTeam(newTeam:Team):void
+		{
+			var oldTeam:Team = getTeam(newTeam.id);
+			if (oldTeam)
+			{
+				oldTeam.name = newTeam.name;
+				var e:DataManagerEvent = new DataManagerEvent(DataManagerEvent.TEAM_DATA_CHANGED);
+				dispatchEvent(e);
+				ServiceManager.getInstance().sendTeamsToStudents();
+			}
+		}
+		
+		public function removeTeam(id:String):void
+		{
+			var tindex:int = teacher.teams.length;
+			var t:Team;
+			for (var i:int = tindex - 1; i >= 0; i--)
+			{
+				t = teacher.teams[i];
+				if (t.id == id)
+				{
+					teacher.teams.splice(i, 1); // delete
+					var e:DataManagerEvent = new DataManagerEvent(DataManagerEvent.TEAM_DATA_CHANGED);
+					dispatchEvent(e);
+					ServiceManager.getInstance().sendTeamsToStudents();
+				}
+			}
+		}
+		
+		public function getTeam(id:String):Team
+		{
+			var tindex:int = teacher.teams.length;
+			var t:Team;
+			for (var i:int = tindex - 1; i >= 0; i--)
+			{
+				t = teacher.teams[i];
+				if (t.id == id)
+				{
+					return t;
+				}
+			}
+			
+			return null;
+		}
+		
+		public function getTeams():Array
+		{
+			return teacher.teams;
+		}
+		
+		public function addAnswer(answer:Answer):void
+		{
+			if (!answer) return;
+			
+			removeAnswer(answer.studentID, answer.questionID);
+			teacher.answers.push(answer);
+			
+			var e:DataManagerEvent = new DataManagerEvent(DataManagerEvent.ANSWER_DATA_CHANGED);
+			dispatchEvent(e);
+		}
+		
+		public function removeAnswer(studentID:String, questionID:String):void
+		{
+			var aindex:int = teacher.answers.length;
+			var a:Answer;
+			for (var i:int = aindex - 1; i >= 0; i--)
+			{
+				a = teacher.answers[i];
+				if (a.studentID == studentID &&
+					a.questionID == questionID)
+				{
+					teacher.answers.splice(i, 1); // delete
+					var e:DataManagerEvent = new DataManagerEvent(DataManagerEvent.ANSWER_DATA_CHANGED);
+					dispatchEvent(e);
+				}
+			}
+		}
+		
+		public function getAnswer(studentID:String, questionID:String):Answer
+		{
+			var aindex:int = teacher.answers.length;
+			var a:Answer;
+			for (var i:int = aindex - 1; i >= 0; i--)
+			{
+				a = teacher.answers[i];
+				if (a.studentID == studentID &&
+					a.questionID == questionID)
+				{
+					return a;
+				}
+			}
+			
+			return null;
+		}
+		
+		public function getAnswers():Array
+		{
+			return teacher.answers;
+		}
+		
+	}
+}

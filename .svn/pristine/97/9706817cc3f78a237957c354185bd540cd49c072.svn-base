@@ -1,0 +1,38 @@
+package com.xiaomu.view.homeview
+{
+	import com.xiaomu.view.questionview.QuestionView;
+	
+	import coco.core.UIComponent;
+	
+	/**
+	 * 首页 
+	 * @author coco
+	 * 
+	 */	
+	public class HomeView extends UIComponent
+	{
+		public function HomeView()
+		{
+			super();
+		}
+		
+		private var questionView:QuestionView;
+		
+		override protected function createChildren():void
+		{
+			super.createChildren();
+			
+			questionView = new QuestionView();
+			questionView.width = 200;
+			addChild(questionView);
+		}
+		
+		override protected function updateDisplayList():void
+		{
+			super.updateDisplayList();
+			
+			questionView.height = height;
+		}
+		
+	}
+}

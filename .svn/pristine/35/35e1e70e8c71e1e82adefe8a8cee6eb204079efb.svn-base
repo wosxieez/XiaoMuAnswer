@@ -1,0 +1,74 @@
+package com.xiaomu.renderer
+{
+	import com.xiaomu.manager.DataManager;
+	
+	import coco.component.Image;
+	import coco.component.ItemRenderer;
+	import coco.event.ItemRendererEvent;
+	import coco.manager.IToolTip;
+	
+	public class HeartItemRenderer extends ItemRenderer implements IToolTip
+	{
+		public function HeartItemRenderer()
+		{
+			super();
+			borderAlpha = 0;
+		}
+		
+		//---------------------
+		//	toolTip
+		//---------------------
+		private var _tooltip:String;
+		
+		/**
+		 * 工具提示 
+		 */		
+		public function get toolTip():String
+		{
+			return _tooltip;
+		}
+		
+		public function set toolTip(value:String):void
+		{
+			_tooltip = value;
+		}
+		
+		private var icon:Image;
+		
+		
+		override protected function createChildren():void
+		{
+			super.createChildren();
+			
+			icon = new Image();
+			icon.x = 3;
+			icon.y = 3;
+			icon.source = "assets/heart.png";
+			addChild(icon);
+		}
+		
+		override protected function commitProperties():void
+		{
+			super.commitProperties();
+			
+			if (data)
+				toolTip = DataManager.getInstance().getQuestion(data.questionID).name;
+			else
+				toolTip = "";
+		}
+		
+		override protected function updateDisplayList():void
+		{
+			super.updateDisplayList();
+			
+			icon.width = width - 6;
+			icon.height = height - 6;
+		}
+		
+		override protected function this_selectedHandler(event:ItemRendererEvent):void
+		{
+			event.preventDefault();
+		}
+		
+	}
+}

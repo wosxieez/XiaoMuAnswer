@@ -1,0 +1,32 @@
+package com.xiaomu.data
+{
+	
+	/**
+	 * 答案
+	 *  
+	 * @author coco
+	 */	
+	public class Question
+	{
+		/**
+		 * 答案唯一标示 
+		 */		
+		public var id:String;
+		
+		/**
+		 * 问题的内容 
+		 */		
+		public var content:String;
+		
+		/**
+		 * 问题的答案 
+		 */		
+		public var answers:Vector.<String> = new Vector.<String>();
+		
+		/**
+		 * 是否允许多选 
+		 */		
+		public var allowMultipleSelection:Boolean = false;
+		
+	}
+}

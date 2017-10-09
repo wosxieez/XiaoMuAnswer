@@ -1,0 +1,52 @@
+package com.xiaomu.view.questionview
+{
+	import flash.events.MouseEvent;
+	
+	import coco.component.Button;
+	import coco.component.List;
+	import coco.component.SkinComponent;
+	import coco.manager.PopUpManager;
+	
+	public class QuestionView extends SkinComponent
+	{
+		public function QuestionView()
+		{
+			super();
+		}
+		
+		private var questionList:List;
+		private var addButton:Button;
+		
+		override protected function createChildren():void
+		{
+			super.createChildren();
+			
+			questionList = new List();
+			questionList.dataProvider = ["1", "2", '3'];
+			addChild(questionList);
+			
+			addButton = new Button();
+			addButton.height = 30;
+			addButton.label = "添加问题";
+			addButton.addEventListener(MouseEvent.CLICK, addButton_clickHandler);
+			addChild(addButton);
+		}
+		
+		override protected function updateDisplayList():void
+		{
+			super.updateDisplayList();
+			
+			addButton.width = width;
+			addButton.y = height - addButton.height;
+			
+			questionList.width = width;
+			questionList.height = addButton.y;
+		}
+		
+		protected function addButton_clickHandler(event:MouseEvent):void
+		{
+			PopUpManager.centerPopUp(PopUpManager.addPopUp(AddQuestionView.getInstance()));
+		}
+		
+	}
+}

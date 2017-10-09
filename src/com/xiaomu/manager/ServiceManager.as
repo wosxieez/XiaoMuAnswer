@@ -1,0 +1,262 @@
+package com.xiaomu.manager
+{
+	import com.xiaomu.data.Answer;
+	import com.xiaomu.data.Question;
+	import com.xiaomu.data.Student;
+	
+	import flash.events.EventDispatcher;
+	
+	import coco.core.Application;
+	import coco.data.Message;
+	import coco.event.SocketEvent;
+	import coco.net.SocketServer;
+	import coco.net.SocketServerClient;
+	
+	[Event(name="log", type="coco.event.SocketEvent")]
+	
+	/**
+	 * Socket服务管理器 
+	 * 
+	 * @author coco
+	 */	
+	public class ServiceManager extends EventDispatcher
+	{
+		public function ServiceManager()
+		{
+		}
+		
+		//----------------------------------------------------------------------------------------------------------------
+		//
+		//  Get Instance
+		//
+		//----------------------------------------------------------------------------------------------------------------
+		
+		private static var instance:ServiceManager;
+		
+		public static function getInstance():ServiceManager
+		{
+			if (!instance)
+				instance = new ServiceManager();
+			
+			return instance;
+		}
+		
+		
+		//----------------------------------------------------------------------------------------------------------------
+		//
+		//  Variables
+		//
+		//----------------------------------------------------------------------------------------------------------------
+		
+		private var curApplication:Application;
+		
+		/**
+		 * 学生客户端 
+		 */		
+		public var studentClients:Vector.<SocketServerClient> = new Vector.<SocketServerClient>();
+		
+		
+		//----------------------------------------------------------------------------------------------------------------
+		//
+		//  Methods
+		//
+		//----------------------------------------------------------------------------------------------------------------
+		
+		public function init(application:Application):void
+		{
+			curApplication = application;
+			
+			// 初始化通信服务器
+			SocketServer.getInstance().addEventListener(SocketEvent.LOG, server_logHandler);
+			SocketServer.getInstance().addEventListener(SocketEvent.CONNECT, socketServer_connectHandler);
+			SocketServer.getInstance().start();
+		}
+		
+		public function dispose():void
+		{
+			SocketServer.getInstance().stop();
+		}
+		
+		/**
+		 * 把小组信息全部推送给学生
+		 */		
+		public function sendTeamsToStudents():void
+		{
+			var message:Message = new Message();
+			message.type = "teams";
+			message.content = DataManager.getInstance().getTeams();
+			
+			for each(var client:SocketServerClient in studentClients)
+			{
+				client.send(message);
+			}
+		}
+		
+		/**
+		 * 把问题推送给学生 
+		 * @param question
+		 */		
+		public function sendQuestionToStudents(question:Question):void
+		{
+			if (!question) return;
+			
+			var message:Message = new Message();
+			message.type = "question";
+			message.content = question;
+			
+			for each(var client:SocketServerClient in studentClients)
+			{
+				client.send(message);
+			}
+		}
+		
+		protected function server_logHandler(event:SocketEvent):void
+		{
+			var e:SocketEvent = new SocketEvent(SocketEvent.LOG);
+			e.descript = event.descript;
+			dispatchEvent(e);
+			trace(event.descript);
+		}
+		
+		protected function socketServer_connectHandler(event:SocketEvent):void
+		{
+			// 有学生端连接
+			event.client.addEventListener(SocketEvent.LOG, client_logHandler);
+			event.client.addEventListener(SocketEvent.MESSAGE, client_messageHandler);
+			event.client.addEventListener(SocketEvent.DISCONNECT, client_disconnectHandler);
+			studentClients.push(event.client);
+			
+			// 有学生端连接就生成个学生数据
+			var student:Student = new Student();
+			student.id = event.client.remoteAddress;
+			DataManager.getInstance().addStudent(student);
+			
+			// 将学生信息发送给学生
+			var smessage:Message = new Message();
+			smessage.type = "student";
+			smessage.content = student;
+			event.client.send(smessage);
+			
+			// 发送小组信息给学生
+			var message:Message = new Message();
+			message.type = "teams";
+			message.content = DataManager.getInstance().getTeams();
+			event.client.send(message);
+		}
+		
+		protected function client_logHandler(event:SocketEvent):void
+		{
+			var e:SocketEvent = new SocketEvent(SocketEvent.LOG);
+			e.descript = event.descript;
+			dispatchEvent(e);
+			trace(event.descript);
+		}
+		
+		protected function client_messageHandler(event:SocketEvent):void
+		{
+			var message:Message = event.message;
+			switch(message.type)
+			{
+				case "student":
+				{
+					var newStudent:Student = new Student();
+					newStudent.id = event.client.remoteAddress;
+					newStudent.name = message.content.name;
+					newStudent.teamID = message.content.teamID;
+					DataManager.getInstance().addStudent(newStudent);
+					break;
+				}
+				case "answer":
+				{
+					var answer:Answer = new Answer();
+					answer.name = message.content.name;
+					answer.studentID = message.content.studentID;
+					answer.questionID = message.content.questionID;
+					answer.answers = message.content.answers;
+					answer.correct = message.content.correct;
+					DataManager.getInstance().addAnswer(answer);
+					break;
+				}
+				default:
+				{
+					break;
+				}
+			}
+		}
+		
+		protected function client_disconnectHandler(event:SocketEvent):void
+		{
+			var client:SocketServerClient = event.client;
+			if (client)
+			{
+				trace(client.remoteAddress, "已断开连接");
+				removeStudentClientByID(client.remoteAddress); // 删除通信链路
+				DataManager.getInstance().removeStudent(client.remoteAddress); // 删除学生数据
+			}
+		}
+		
+		
+		//----------------------------------------------------------------------------------------------------------------
+		//
+		//  StudentClient 操作
+		//
+		//----------------------------------------------------------------------------------------------------------------
+		
+		public function addStudentClient(client:SocketServerClient):void
+		{
+			if (!client) return;
+			
+			removeStudentClient(client);
+			studentClients.push(client);
+		}
+		
+		public function removeStudentClient(client:SocketServerClient):void
+		{
+			if (!client) return;
+			
+			var aindex:int = studentClients.length;
+			var a:SocketServerClient;
+			for (var i:int = aindex - 1; i >= 0; i--)
+			{
+				a = studentClients[i];
+				if (a.remoteAddress == client.remoteAddress)
+				{
+					studentClients.splice(i, 1); // delete
+				}
+			}
+		}
+		
+		public function removeStudentClientByID(id:String):void
+		{
+			var aindex:int = studentClients.length;
+			var a:SocketServerClient;
+			for (var i:int = aindex - 1; i >= 0; i--)
+			{
+				a = studentClients[i];
+				if (a.remoteAddress == id)
+				{
+					studentClients.splice(i, 1); // delete
+				}
+			}
+		}
+		
+		public function getStudentClient(remoteAddress:String):SocketServerClient
+		{
+			var aindex:int = studentClients.length;
+			var a:SocketServerClient;
+			for (var i:int = aindex - 1; i >= 0; i--)
+			{
+				a = studentClients[i];
+				if (a.remoteAddress == remoteAddress)
+				{
+					return a;
+				}
+			}
+			
+			return null;
+		}
+		
+	}
+}
+
+

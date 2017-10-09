@@ -1,0 +1,32 @@
+package com.xiaomu.view.homeview
+{
+	import coco.component.SkinComponent;
+	
+	/**
+	 * 首页 
+	 * @author coco
+	 * 
+	 */	
+	public class HomeView extends SkinComponent
+	{
+		public function HomeView()
+		{
+			super();
+			
+			borderAlpha = backgroundAlpha = 1;
+			borderColor = 0xF0E7CC;
+			backgroundColor = 0xFEFBF0;
+		}
+		
+		override protected function createChildren():void
+		{
+			super.createChildren();
+		}
+		
+		override protected function updateDisplayList():void
+		{
+			super.updateDisplayList();
+		}
+		
+	}
+}

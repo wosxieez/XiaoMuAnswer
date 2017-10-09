@@ -1,0 +1,117 @@
+package com.xiaomu.view.teamview
+{
+	import com.xiaomu.data.Team;
+	import com.xiaomu.manager.DataManager;
+	
+	import flash.events.MouseEvent;
+	
+	import coco.component.Button;
+	import coco.component.Panel;
+	import coco.component.TextInput;
+	import coco.manager.PopUpManager;
+	
+	/**
+	 * 添加小组视图 
+	 * @author coco
+	 * 
+	 */	
+	public class AddTeamView extends Panel
+	{
+		public function AddTeamView()
+		{
+			super();
+			
+			width = 200;
+			height = 90;
+			title = "添加小组";
+		}
+		
+		//------------------------------------------------------------------------------------------------------------------------------------------------------
+		//
+		//  Get Instance
+		//
+		//------------------------------------------------------------------------------------------------------------------------------------------------------
+		
+		private static var instance:AddTeamView;
+		
+		public static function getInstance():AddTeamView
+		{
+			if (!instance)
+				instance = new AddTeamView();
+			
+			return instance;
+		}
+		
+		
+		//------------------------------------------------------------------------------------------------------------------------------------------------------
+		//
+		//  Variables
+		//
+		//------------------------------------------------------------------------------------------------------------------------------------------------------
+		
+		private var teamNameInput:TextInput;
+		private var cancelButton:Button;
+		private var okButton:Button;
+		
+		
+		//------------------------------------------------------------------------------------------------------------------------------------------------------
+		//
+		//  Methods
+		//
+		//------------------------------------------------------------------------------------------------------------------------------------------------------
+		
+		
+		override protected function createChildren():void
+		{
+			super.createChildren();
+			
+			teamNameInput = new TextInput();
+			addChild(teamNameInput);
+			
+			cancelButton = new Button();
+			cancelButton.label = "取消";
+			cancelButton.height = 30;
+			cancelButton.addEventListener(MouseEvent.CLICK, cancelButton_clickHandler);
+			addChild(cancelButton);
+			
+			okButton = new Button();
+			okButton.label = "确定";
+			okButton.height = 30;
+			okButton.addEventListener(MouseEvent.CLICK, okButton_clickHandler);
+			addChild(okButton);
+		}
+		
+		override protected function updateDisplayList():void
+		{
+			super.updateDisplayList();
+			
+			cancelButton.width = width/2;
+			cancelButton.y = contentHeight - cancelButton.height;
+			
+			okButton.width = cancelButton.width;
+			okButton.x = cancelButton.width;
+			okButton.y = cancelButton.y;
+			
+			teamNameInput.width = width;
+			teamNameInput.height = okButton.y;
+		}
+		
+		protected function okButton_clickHandler(event:MouseEvent):void
+		{
+			// 保存到数据管理器中
+		 	var team:Team = new Team();
+			team.name = teamNameInput.text;
+			DataManager.getInstance().addTeam(team);
+			
+			// 关闭窗口
+			PopUpManager.removePopUp(this);
+		}
+		
+		protected function cancelButton_clickHandler(event:MouseEvent):void
+		{
+			// 关闭窗口
+			PopUpManager.removePopUp(this);
+		}
+		
+	}
+}

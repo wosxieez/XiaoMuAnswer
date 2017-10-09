@@ -1,0 +1,46 @@
+package com.xiaomu.manager
+{
+	import coco.core.Application;
+
+	/**
+	 * Socket服务管理器 
+	 * 
+	 * @author coco
+	 */	
+	public class SocketServerManager
+	{
+		public function SocketServerManager()
+		{
+		}
+		
+		//----------------------------------------------------------------------------------------------------------------
+		//
+		//  Get Instance
+		//
+		//----------------------------------------------------------------------------------------------------------------
+		
+		private static var instance:SocketServerManager;
+		
+		public static function getInstance():SocketServerManager
+		{
+			if (!instance)
+				instance = new SocketServerManager();
+			
+			return instance;
+		}
+		
+		//----------------------------------------------------------------------------------------------------------------
+		//
+		//  Methods
+		//
+		//----------------------------------------------------------------------------------------------------------------
+		
+		private var curApplication:Application;
+		
+		public function init(application:Application):void
+		{
+			curApplication = application;
+		}
+		
+	}
+}

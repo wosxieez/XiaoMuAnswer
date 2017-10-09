@@ -1,0 +1,27 @@
+package com.xiaomu.data
+{
+	public class Teacher
+	{
+		
+		/**
+		 * 教师唯一标示 
+		 */		
+		public var id:String;
+		
+		/**
+		 * 教师名称 
+		 */		
+		public var name:String;
+		
+		/**
+		 * 教师定的团队 
+		 */		
+		public var teams:Vector.<Team> = new Vector.<Team>();
+		
+		/**
+		 * 教师定的题目
+		 */		
+		public var questions:Vector.<Question> = new Vector.<Question>();
+		
+	}
+}

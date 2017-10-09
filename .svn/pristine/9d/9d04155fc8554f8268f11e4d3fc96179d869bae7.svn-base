@@ -1,0 +1,22 @@
+package com.xiaomu.data
+{
+	public class Student
+	{
+		
+		/**
+		 * 学生唯一标示 
+		 */		
+		public var id:String;
+		
+		/**
+		 * 学生姓名 
+		 */		
+		public var name:String;
+		
+		/**
+		 * 学生组名称
+		 */		
+		public var groupName:String;
+		
+	}
+}
