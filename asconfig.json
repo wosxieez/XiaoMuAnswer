@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "output": "bin-debug/XiaoMuAnswer.swf",
+    "source-path": ["src"],
+    "library-path": ["libs"]
+  },
+  "files": ["src/XiaoMuAnswer.as"],
+  "application": "src/XiaoMuAnswer-app.xml",
+  "copySourcePathAssets": true,
+  "additionalOptions": "-locale en_US",
+  "airOptions": {
+    "output": "XiaoMuAnswer.air",
+    "signingOptions": {
+      "keystore": "greencloud.p12",
+      "storetype": "pkcs12"
+    }
+  },
+  "config": "air"
+}

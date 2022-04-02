@@ -106,7 +106,7 @@ package
 		
 		private function initApplication():void
 		{
-			checkAppVersion();
+			// checkAppVersion();
 			
 			ServiceManager.getInstance().init(this);
 		}

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
-<application xmlns="http://ns.adobe.com/air/application/23.0">
+<application xmlns="http://ns.adobe.com/air/application/33.1">
 
 	<!-- Adobe AIR Application Descriptor File Template. Specifies parameters 
 		for identifying, installing, and launching AIR applications. xmlns - The 
@@ -152,14 +152,6 @@
 
 	<!-- The icon the system uses for the application. For at least one resolution, 
 		specify the path to a PNG file included in the AIR package. Optional. -->
-	<icon> 
-		<image16x16>assets/icon/icon16.png</image16x16> 
-		<image36x36>assets/icon/icon36.png</image36x36> 
-		<image72x72>assets/icon/icon72.png</image72x72>
-		<image96x96>assets/icon/icon96.png</image96x96> 
-		<image128x128>assets/icon/icon128.png</image128x128> 
-	</icon>
-
 	<!-- Whether the application handles the update when a user double-clicks 
 		an update version of the AIR file (true), or the default AIR application 
 		installer handles the update (false). Optional. Default false. -->
