@@ -4,4 +4,4 @@
 * Mac Download: https://airsdk.harman.com/assets/downloads/AdobeAIR.dmg
 * Win Download: https://airsdk.harman.com/assets/downloads/AdobeAIR.exe
 
-<img src="https://raw.githubusercontent.com/wosxieez/XiaoMuAnswer/master/screenshot/screen1.jpg" alt="" width="600" height="400"/>
+<img src="https://raw.githubusercontent.com/wosxieez/XiaoMuAnswer/master/screenshot/screen1.png" alt="" width="600" height="400"/>
