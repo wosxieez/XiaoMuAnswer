@@ -7,5 +7,6 @@
 * [教师端下载](https://github.com/wosxieez/XiaoMuAnswer/releases)
 * [学生端下载](https://github.com/wosxieez/XiaoMuStudent/releases)
 <br/>
-<img src="https://raw.githubusercontent.com/wosxieez/XiaoMuAnswer/master/screenshot/screen1.png" alt="" width="600" height="400"/>
-<img src="https://raw.githubusercontent.com/wosxieez/XiaoMuAnswer/master/screenshot/screen2.png" alt="" width="600" height="400"/>
+<img src="https://hefeixiaomu.oss-cn-hangzhou.aliyuncs.com/coco/screen6.png" alt="" width="800" height="500"/>
+<br/>
+<img src="https://hefeixiaomu.oss-cn-hangzhou.aliyuncs.com/coco/screen7.png" alt="" width="800" height="500"/>
