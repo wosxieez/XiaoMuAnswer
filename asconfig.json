@@ -11,7 +11,7 @@
   "airOptions": {
     "output": "XiaoMuAnswer.air",
     "signingOptions": {
-      "keystore": "greencloud.p12",
+      "keystore": "ixiaomu.p12",
       "storetype": "pkcs12"
     }
   },
